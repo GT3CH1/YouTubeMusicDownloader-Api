@@ -10,7 +10,7 @@ public class SongsDbContext : DbContext
     public string ConnectionString { get; set; }
     public SongsDbContext(DbContextOptions<SongsDbContext> options) : base(options)
     {
-        
+        this.Database.EnsureCreated();
     }
     public DbSet<Song> Songs { get; set; }
 
