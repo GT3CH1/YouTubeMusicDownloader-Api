@@ -24,10 +24,15 @@ public class SongController : Controller
     [Route("Add")]
     public string AddSong([FromBody] Song song)
     {
-        // Add the song to the database
-        dbContext.Songs.Add(song);
-        dbContext.SaveChanges();
-        return "Song Added";
+        // Check to see if the song already exists
+        if (dbContext.Songs.Any(s => s.Url == song.Url))
+            return "Song already exists";
+        else
+        {
+            dbContext.Songs.Add(song);
+            dbContext.SaveChanges();
+            return "Song added";
+        }
     }
     
     // Add a list of songs to the database
@@ -40,4 +45,13 @@ public class SongController : Controller
         dbContext.SaveChanges();
         return "Songs Added";
     }
+    
+    // Get a list of all songs in the database
+    [HttpGet]
+    [Route("GetAll")]
+    public JsonResult GetAllSongs()
+    {
+        return Json(dbContext.Songs.ToList());
+    }
+    
 }
