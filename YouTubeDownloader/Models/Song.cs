@@ -1,0 +1,12 @@
+using System.ComponentModel.DataAnnotations;
+
+namespace YouTubeDownloader.Models;
+
+public class Song
+{
+    [Key]
+    public string Url { get; set; }
+    public string Title { get; set; }
+    public string Artist { get; set; }
+    public string Album { get; set; }
+}
