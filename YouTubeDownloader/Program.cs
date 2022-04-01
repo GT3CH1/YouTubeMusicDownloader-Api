@@ -10,6 +10,10 @@ builder.Services.AddDbContext<SongsDbContext>(options =>
 {
     options.UseSqlite("Data Source=songs.db");
 });
+// Get SongsDbContext from services provider.
+// var dbContext = builder.Services.BuildServiceProvider().GetService<SongsDbContext>();
+// dbContext.Database.Migrate();
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 
@@ -27,5 +31,8 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 app.UseRouting();
 app.MapControllers();
-
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapControllers();
+});
 app.Run();

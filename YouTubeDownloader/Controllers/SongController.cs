@@ -1,12 +1,13 @@
 using Microsoft.AspNetCore.Mvc;
 using NYoutubeDL;
 using NYoutubeDL.Helpers;
+using TagLib;
 using YouTubeDownloader.Contexts;
 using YouTubeDownloader.Models;
 
 namespace YouTubeDownloader.Controllers;
 
-[Route("api/[controller]")]
+[Route("[controller]")]
 public class SongController : Controller
 {
     private SongsDbContext dbContext;
@@ -17,25 +18,24 @@ public class SongController : Controller
     }
 
     // GET
-    public string Index()
+    public IActionResult Index()
     {
-        return "string";
+        return View(dbContext.Songs.ToList());
     }
 
     // Add a Song to the Database
     [HttpPost]
     [Route("Add")]
-    public string AddSong([FromBody] Song song)
+    public IActionResult AddSong([FromForm] Song song)
     {
         // Check to see if the song already exists
-        if (dbContext.Songs.Any(s => s.Url == song.Url))
-            return "Song already exists";
-        else
+        if (!dbContext.Songs.Any(s => s.Url == song.Url))
         {
             dbContext.Songs.Add(song);
             dbContext.SaveChanges();
-            return "Song added";
         }
+
+        return RedirectToAction("Index");
     }
 
     // Add a list of songs to the database
@@ -66,34 +66,58 @@ public class SongController : Controller
         foreach (var song in list)
         {
             DownloadSong(song);
+            // Mark song as downloaded, update database
+            song.SetDownloaded();
+            dbContext.Songs.Update(song);
+            dbContext.SaveChanges();
         }
     }
 
     private void DownloadSong(Song song)
     {
-        var youtubeDl = new YoutubeDLP();
-        // Set youtubedl path to /usr/bin/youtube-dl
-        youtubeDl.YoutubeDlPath = @"C:\Users\gcpease\.bin\youtube-dl.exe";
-        // Set audio to best
-        youtubeDl.Options.PostProcessingOptions.AudioFormat = Enums.AudioFormat.mp3;
+        // Remove punctuation from the song title using LINQ
+        song.Title = new string(song.Title.Where(c => !(char.IsPunctuation(c) || char.IsSymbol(c))).ToArray());
+        // Remove punctuation from the song artist using LINQ
+        song.Artist = new string(song.Artist.Where(c => !(char.IsPunctuation(c) || char.IsSymbol(c))).ToArray());
+        // Remove punctuation from the song album using LINQ
+        song.Album = new string(song.Album.Where(c => !(char.IsPunctuation(c) || char.IsSymbol(c))).ToArray());
+
+        var youtubeDl = new YoutubeDL();
+        
+        youtubeDl.Options.PostProcessingOptions.AudioFormat = Enums.AudioFormat.m4a;
         // Extract audio
         youtubeDl.Options.PostProcessingOptions.ExtractAudio = true;
+        youtubeDl.Options.VideoFormatOptions.Format = Enums.VideoFormat.best;
         // Make Artist/Album directories
         // Create path to file
-        var dir = $"Songs/{song.Artist}/{song.Album}";
-        var path = $"{dir}/{song.Title}.mp3";
+        var dir = Path.Combine(Directory.GetCurrentDirectory(), "Songs", song.Artist, song.Album);
+        var path = Path.Combine(dir, song.Title + ".m4a");
+        // print dir and path
+        Console.WriteLine(dir);
+        Console.WriteLine(path);
         Directory.CreateDirectory(dir);
         // Set output directory
         youtubeDl.Options.FilesystemOptions.Output = path;
+        // Set write meta data
+        youtubeDl.Options.PostProcessingOptions.AddMetadata = true;
+        // Prefer ffmpeg
+        youtubeDl.Options.PostProcessingOptions.PreferFfmpeg = true;
+        // Remove temp files
+
         // Download the song
         youtubeDl.VideoUrl = song.Url;
         if (!System.IO.File.Exists(path))
-            youtubeDl.Download(song.Url);
-        // Tag the song.
+        {
+            var prepared = youtubeDl.PrepareDownload();
+            Console.WriteLine(prepared);
+            Console.WriteLine($"Downloading {song.Title}");
+            youtubeDl.Download();
+        }
         var file = TagLib.File.Create(path);
-        file.Tag.Album = song.Album;
         file.Tag.Title = song.Title;
+        file.Tag.Performers = new[] { song.Artist };
         file.Tag.AlbumArtists = new[] { song.Artist };
+        file.Tag.Album = song.Album;
         file.Save();
     }
 }

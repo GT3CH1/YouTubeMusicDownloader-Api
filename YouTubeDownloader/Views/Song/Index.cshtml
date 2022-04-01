@@ -1,0 +1,51 @@
+﻿@model List<YouTubeDownloader.Models.Song>
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Home Page";
+}
+<br/>
+<div>
+    <!-- Create inputs for Title, Artist, Album, and Url -->
+    <form action="/Song/Add" method="POST">
+        <div class="form-group">
+            <label for="Title">Title</label>
+            <input type="text" class="w3-input" id="Title" name="Title" placeholder="Compliance">
+        </div>
+        <div class="form-group">
+            <label for="Artist">Artist</label>
+            <input type="text" class="w3-input" id="Artist" name="Artist" placeholder="Muse">
+        </div>
+        <div class="form-group">
+            <label for="Album">Album</label>
+            <input type="text" class="w3-input" id="Album" name="Album" placeholder="Will of the People">
+        </div>
+        <div class="form-group">
+            <label for="Url">Url</label>
+            <input type="text" class="w3-input" id="Url" name="Url" placeholder="https://www.youtube.com/watch?v=QP3zRBtgvJo">
+        </div>
+        <br/>
+        <button type="submit" class="w3-button w3-green">Submit</button>
+    </form>
+</div>
+<table class="w3-table-all">
+    <thead>
+    <tr class="w3-light-grey">
+        <th>Title</th>
+        <th>Artist</th>
+        <th>Album</th>
+        <th>Url</th>
+        <th>Downloaded?</th>
+    </tr>
+    </thead>
+    @foreach (var song in Model)
+    {
+        <tr>
+            <td>@song.Title</td>
+            <td>@song.Artist</td>
+            <td>@song.Album</td>
+            <td><a href="@song.Url" target="_blank">@song.Url</a></td>
+            <td>@(song.IsDownloaded() ? "Yes" : "No")</td>
+        </tr>
+    }
+
+</table>
