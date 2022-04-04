@@ -34,6 +34,7 @@
         <th>Artist</th>
         <th>Album</th>
         <th>Url</th>
+        <th>Id</th>
         <th>Downloaded?</th>
     </tr>
     </thead>
@@ -44,6 +45,7 @@
             <td>@song.Artist</td>
             <td>@song.Album</td>
             <td><a href="@song.Url" target="_blank">@song.Url</a></td>
+            <td>@song.Id</td>
             <td>@(song.IsDownloaded() ? "Yes" : "No")</td>
         </tr>
     }

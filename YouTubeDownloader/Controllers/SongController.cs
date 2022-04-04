@@ -73,6 +73,33 @@ public class SongController : Controller
         }
     }
 
+    // Download an individual song based off of its Id.
+    [HttpGet]
+    [Route("Download/{id}")]
+    public void DownloadSong(int id)
+    {
+        var song = dbContext.Songs.FirstOrDefault(s => s.Id == id);
+        if (song != null)
+            DownloadSong(song);
+        // Mark song as downloaded, update database
+        song.SetDownloaded();
+        dbContext.Songs.Update(song);
+        dbContext.SaveChanges();
+    }
+    
+    // Delete a song based off of its id.
+    [HttpDelete]
+    [Route("Delete/{id}")]
+    public void DeleteSong(int id)
+    {
+        var song = dbContext.Songs.FirstOrDefault(s => s.Id == id);
+        if (song != null)
+        {
+            dbContext.Songs.Remove(song);
+            dbContext.SaveChanges();
+        }
+    }
+
     private void DownloadSong(Song song)
     {
         // Remove punctuation from the song title using LINQ
@@ -83,7 +110,7 @@ public class SongController : Controller
         song.Album = new string(song.Album.Where(c => !(char.IsPunctuation(c) || char.IsSymbol(c))).ToArray());
 
         var youtubeDl = new YoutubeDL();
-        
+
         youtubeDl.Options.PostProcessingOptions.AudioFormat = Enums.AudioFormat.m4a;
         // Extract audio
         youtubeDl.Options.PostProcessingOptions.ExtractAudio = true;
@@ -92,9 +119,6 @@ public class SongController : Controller
         // Create path to file
         var dir = Path.Combine(Directory.GetCurrentDirectory(), "Songs", song.Artist, song.Album);
         var path = Path.Combine(dir, song.Title + ".m4a");
-        // print dir and path
-        Console.WriteLine(dir);
-        Console.WriteLine(path);
         Directory.CreateDirectory(dir);
         // Set output directory
         youtubeDl.Options.FilesystemOptions.Output = path;
@@ -102,7 +126,6 @@ public class SongController : Controller
         youtubeDl.Options.PostProcessingOptions.AddMetadata = true;
         // Prefer ffmpeg
         youtubeDl.Options.PostProcessingOptions.PreferFfmpeg = true;
-        // Remove temp files
 
         // Download the song
         youtubeDl.VideoUrl = song.Url;
@@ -113,6 +136,7 @@ public class SongController : Controller
             Console.WriteLine($"Downloading {song.Title}");
             youtubeDl.Download();
         }
+
         var file = TagLib.File.Create(path);
         file.Tag.Title = song.Title;
         file.Tag.Performers = new[] { song.Artist };
