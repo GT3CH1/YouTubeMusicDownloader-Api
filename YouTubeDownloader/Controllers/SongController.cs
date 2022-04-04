@@ -99,6 +99,19 @@ public class SongController : Controller
             dbContext.SaveChanges();
         }
     }
+    
+    // Delete a list of songs based off of their ids.
+    [HttpDelete]
+    [Route("DeleteList")]
+    public void DeleteSongList([FromBody] List<int> ids)
+    {
+        var songs = dbContext.Songs.Where(s => ids.Contains(s.Id));
+        if (songs != null)
+        {
+            dbContext.Songs.RemoveRange(songs);
+            dbContext.SaveChanges();
+        }
+    }
 
     private void DownloadSong(Song song)
     {
