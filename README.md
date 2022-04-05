@@ -31,11 +31,46 @@ POST /api/Song/AddList
     }
 ]
 ```
+### Get a list of songs
+```http request
+GET /api/Song/GetList
+```
+### Get a song
+```http request
+GET /api/Song/Get/{id}
+```
+### Delete a song
+```http request
+DELETE /api/Song/Delete/{id}
+```
+### Delete all songs
+```http request
+DELETE /api/Song/DeleteAll
+```
+### Edit a song
+```http request
+PUT /api/Song/Edit/{id}
+{
+    "Url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+    "Title": "Test Video",
+    "Artist": "Test Artist",
+    "Album": "Test Album",
+}
+```
+### Download a song
+```http request
+GET /api/Song/Download/{id}
+```
+### Download all songs
+```http request
+GET /api/Song/DownloadAll
+```
 
 ## Things to do
-- [ ] Add a way to get a list of songs
-- [ ] Add a way to remove a song/list of songs
-- [ ] Add a way to download ONE song.
-- [ ] Add a way to download all of the songs.
-- [ ] Add a way to set the artist/album/title of a song.
+- [x] Add a way to get a list of songs
+- [x] Add a way to remove a song/list of songs
+- [x] Add a way to download ONE song.
+- [x] Add a way to download all of the songs.
+- [x] Add a way to set the artist/album/title of a song.
 - [ ] Add a way to set the wanted file type for songs
+- [x] Add a way to edit songs
