@@ -65,7 +65,7 @@ public class SongController : Controller
         var list = dbContext.Songs.ToList();
         foreach (var song in list)
         {
-            song.DownloadSong();
+            song.Download();
             dbContext.Songs.Update(song);
             dbContext.SaveChanges();
         }
@@ -79,7 +79,7 @@ public class SongController : Controller
         var song = dbContext.Songs.FirstOrDefault(s => s.Id == id);
         if (song == null)
             return;
-        song.DownloadSong();
+        song.Download();
         dbContext.Songs.Update(song);
         dbContext.SaveChanges();
     }

@@ -37,7 +37,11 @@ public class Song
     public string GetAlbumWithoutPunctuation() =>
         new string(Album.Where(c => !(char.IsPunctuation(c) || char.IsSymbol(c))).ToArray());
 
-    public bool DownloadSong()
+    /// <summary>
+    ///  Downloads this song using youtube-dl.
+    /// </summary>
+    /// <returns>True if the song was successfully downloaded.</returns>
+    public bool Download()
     {
         // Remove punctuation from the song title using LINQ
         Title = new string(GetTitleWithoutPunctuation());
