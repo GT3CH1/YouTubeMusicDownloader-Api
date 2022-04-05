@@ -1,13 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
-using NYoutubeDL;
-using NYoutubeDL.Helpers;
 using TagLib;
 using YouTubeDownloader.Contexts;
 using YouTubeDownloader.Models;
 
 namespace YouTubeDownloader.Controllers;
 
-[Route("[controller]")]
+[Route("/api/[controller]")]
 public class SongController : Controller
 {
     private SongsDbContext dbContext;
@@ -18,6 +16,7 @@ public class SongController : Controller
     }
 
     // GET
+    [Route("/")]
     public IActionResult Index()
     {
         return View(dbContext.Songs.ToList());
@@ -105,6 +104,23 @@ public class SongController : Controller
         if (songs == null)
             return;
         dbContext.Songs.RemoveRange(songs);
+        dbContext.SaveChanges();
+    }
+    
+    // Edit a song based off of its id.
+    [HttpPut]
+    [Route("Edit/{id}")]
+    public void EditSong(int id, [FromBody] Song song)
+    {
+        var songToEdit = dbContext.Songs.FirstOrDefault(s => s.Id == id);
+        if (songToEdit == null)
+            return;
+        songToEdit.Title = song.Title;
+        songToEdit.Artist = song.Artist;
+        songToEdit.Album = song.Album;
+        songToEdit.Url = song.Url;
+        songToEdit.SetDownloaded(false);
+        dbContext.Songs.Update(songToEdit);
         dbContext.SaveChanges();
     }
 }

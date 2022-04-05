@@ -14,7 +14,7 @@ public class Song
     [Key] public int Id { get; set; }
 
     public bool IsDownloaded() => Downloaded == 1;
-    public void SetDownloaded() => Downloaded = 1;
+    public void SetDownloaded(bool value) => Downloaded = value ? 1 : 0;
 
     /// <summary>
     /// Gets the title without punctuation or symbols.
@@ -33,7 +33,7 @@ public class Song
     /// <summary>
     /// Gets the album without punctuation or symbols.
     /// </summary>
-    /// <returns>The album wtihout punctuation.</returns>
+    /// <returns>The album without punctuation.</returns>
     public string GetAlbumWithoutPunctuation() =>
         new string(Album.Where(c => !(char.IsPunctuation(c) || char.IsSymbol(c))).ToArray());
 
@@ -80,7 +80,7 @@ public class Song
         file.Tag.AlbumArtists = new[] { Artist };
         file.Tag.Album = Album;
         file.Save();
-        SetDownloaded();
+        SetDownloaded(true);
         return true;
     }
 }
