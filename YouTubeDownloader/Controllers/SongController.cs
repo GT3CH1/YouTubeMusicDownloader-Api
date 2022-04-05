@@ -116,11 +116,11 @@ public class SongController : Controller
     private void DownloadSong(Song song)
     {
         // Remove punctuation from the song title using LINQ
-        song.Title = new string(song.Title.Where(c => !(char.IsPunctuation(c) || char.IsSymbol(c))).ToArray());
+        song.Title = new string(song.GetTitleWithoutPunctuation());
         // Remove punctuation from the song artist using LINQ
-        song.Artist = new string(song.Artist.Where(c => !(char.IsPunctuation(c) || char.IsSymbol(c))).ToArray());
+        song.Artist = new string(song.GetArtistWithoutPunctuation());
         // Remove punctuation from the song album using LINQ
-        song.Album = new string(song.Album.Where(c => !(char.IsPunctuation(c) || char.IsSymbol(c))).ToArray());
+        song.Album = new string(song.GetAlbumWithoutPunctuation());
 
         var youtubeDl = new YoutubeDL();
 
@@ -128,8 +128,6 @@ public class SongController : Controller
         // Extract audio
         youtubeDl.Options.PostProcessingOptions.ExtractAudio = true;
         youtubeDl.Options.VideoFormatOptions.Format = Enums.VideoFormat.best;
-        // Make Artist/Album directories
-        // Create path to file
         var dir = Path.Combine(Directory.GetCurrentDirectory(), "Songs", song.Artist, song.Album);
         var path = Path.Combine(dir, song.Title + ".m4a");
         Directory.CreateDirectory(dir);
@@ -144,8 +142,6 @@ public class SongController : Controller
         youtubeDl.VideoUrl = song.Url;
         if (!System.IO.File.Exists(path))
         {
-            var prepared = youtubeDl.PrepareDownload();
-            Console.WriteLine(prepared);
             Console.WriteLine($"Downloading {song.Title}");
             youtubeDl.Download();
         }
