@@ -20,4 +20,10 @@
         <PackageReference Include="TagLibSharp" Version="2.2.0" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Content Include="..\README.md">
+        <Link>README.md</Link>
+      </Content>
+    </ItemGroup>
+
 </Project>
