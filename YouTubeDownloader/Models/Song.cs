@@ -41,7 +41,7 @@ public class Song
     ///  Downloads this song using youtube-dl.
     /// </summary>
     /// <returns>True if the song was successfully downloaded.</returns>
-    public bool Download()
+    public bool Download(string songPath)
     {
         // Remove punctuation from the song title using LINQ
         Title = new string(GetTitleWithoutPunctuation());
@@ -56,7 +56,7 @@ public class Song
         // Extract audio
         youtubeDl.Options.PostProcessingOptions.ExtractAudio = true;
         youtubeDl.Options.VideoFormatOptions.Format = Enums.VideoFormat.best;
-        var dir = Path.Combine(Directory.GetCurrentDirectory(), "Songs", Artist, Album);
+        var dir = Path.Combine(songPath, Artist, Album);
         var path = Path.Combine(dir, Title + ".m4a");
         Directory.CreateDirectory(dir);
         // Set output directory

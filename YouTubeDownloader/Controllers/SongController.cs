@@ -9,10 +9,12 @@ namespace YouTubeDownloader.Controllers;
 public class SongController : Controller
 {
     private SongsDbContext dbContext;
+    private IConfiguration config;
 
-    public SongController(SongsDbContext dbContext)
+    public SongController(SongsDbContext dbContext, IConfiguration config)
     {
         this.dbContext = dbContext;
+        this.config = config;
     }
 
     // GET
@@ -64,7 +66,7 @@ public class SongController : Controller
         var list = dbContext.Songs.ToList();
         foreach (var song in list)
         {
-            song.Download();
+            song.Download(config["DownloadPath"]);
             dbContext.Songs.Update(song);
             dbContext.SaveChanges();
         }
@@ -78,7 +80,7 @@ public class SongController : Controller
         var song = dbContext.Songs.FirstOrDefault(s => s.Id == id);
         if (song == null)
             return;
-        song.Download();
+        song.Download(config["DownloadPath"]);
         dbContext.Songs.Update(song);
         dbContext.SaveChanges();
     }
