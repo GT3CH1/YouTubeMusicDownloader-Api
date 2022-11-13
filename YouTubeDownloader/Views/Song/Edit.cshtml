@@ -1,0 +1,17 @@
+﻿@model Song
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Home Page";
+}
+<div>
+    <!-- Create inputs for Title, Artist, Album, and Url -->
+    <form action="/Song/Edit" method="POST">
+        <input asp-for="Id" type="hidden"/>
+        <!-- render _SongForm.cshtml partial -->
+        <partial name="_SongForm"/>
+    </form>
+</div>
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+}

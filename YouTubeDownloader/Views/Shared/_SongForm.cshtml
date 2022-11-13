@@ -1,0 +1,24 @@
+﻿@model Song
+<div class="form-group">
+    <label asp-for="Title"></label>
+    <input type="text" class="w3-input" asp-for="Title" placeholder="A Title">
+    <span asp-validation-for="Title" class="w3-text-red"></span>
+</div>
+<div class="form-group">
+    <label asp-for="Artist"></label>
+    <input type="text" class="w3-input" asp-for="Artist" placeholder="An Artist">
+    <span asp-validation-for="Artist" class="w3-text-red"></span>
+</div>
+<div class="form-group">
+    <label asp-for="Album"></label>
+    <input type="text" class="w3-input" asp-for="Album" placeholder="An Album">
+    <span asp-validation-for="Album" class="w3-text-red"></span>
+</div>
+<div class="form-group">
+    <label asp-for="Url"></label>
+    <input type="text" class="w3-input" asp-for="Url" placeholder="A Url">
+    <span asp-validation-for="Url" class="w3-text-red"></span>
+</div>
+<br/>
+<button type="submit" class="w3-button w3-green">Submit 123</button> &nbsp 
+<a class="w3-button w3-red" href="/Song/Index">Cancel</a>

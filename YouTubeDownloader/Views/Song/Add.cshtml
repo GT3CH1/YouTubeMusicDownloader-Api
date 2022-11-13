@@ -1,0 +1,13 @@
+﻿@model Song
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Home Page";
+}
+<div>
+    <!-- Create inputs for Title, Artist, Album, and Url -->
+    <form asp-action="Add" method="POST">
+        <input asp-for="Id" type="hidden" />
+        <!-- render _SongForm.cshtml partial -->
+        <partial name="_SongForm"/>
+    </form>
+</div>

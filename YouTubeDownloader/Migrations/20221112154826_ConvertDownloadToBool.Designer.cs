@@ -9,8 +9,9 @@ using YouTubeDownloader.Contexts;
 
 namespace YouTubeDownloader.Migrations
 {
-
-    partial class AddDownloadedFlagToSongs
+    [DbContext(typeof(SongsDbContext))]
+    [Migration("20221112154826_ConvertDownloadToBool")]
+    partial class ConvertDownloadToBool
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -19,8 +20,9 @@ namespace YouTubeDownloader.Migrations
 
             modelBuilder.Entity("YouTubeDownloader.Models.Song", b =>
                 {
-                    b.Property<string>("Url")
-                        .HasColumnType("TEXT");
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Album")
                         .IsRequired()
@@ -30,11 +32,18 @@ namespace YouTubeDownloader.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<bool>("Downloaded")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.HasKey("Url");
+                    b.Property<string>("Url")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
 
                     b.ToTable("Songs");
                 });

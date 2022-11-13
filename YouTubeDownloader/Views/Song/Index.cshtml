@@ -1,32 +1,9 @@
-﻿@model List<YouTubeDownloader.Models.Song>
+﻿@model List<Song>
 @{
     Layout = "_Layout";
     ViewData["Title"] = "Home Page";
 }
 <br/>
-<div>
-    <!-- Create inputs for Title, Artist, Album, and Url -->
-    <form action="/api/Song/Add" method="POST">
-        <div class="form-group">
-            <label for="Title">Title</label>
-            <input type="text" class="w3-input" id="Title" name="Title" placeholder="An Album">
-        </div>
-        <div class="form-group">
-            <label for="Artist">Artist</label>
-            <input type="text" class="w3-input" id="Artist" name="Artist" placeholder="An Artist">
-        </div>
-        <div class="form-group">
-            <label for="Album">Album</label>
-            <input type="text" class="w3-input" id="Album" name="Album" placeholder="A Title">
-        </div>
-        <div class="form-group">
-            <label for="Url">Url</label>
-            <input type="text" class="w3-input" id="Url" name="Url" placeholder="https://www.youtube.com/watch?v=changeme">
-        </div>
-        <br/>
-        <button type="submit" class="w3-button w3-green">Submit</button>
-    </form>
-</div>
 <table class="w3-table-all">
     <thead>
     <tr class="w3-light-grey">
@@ -36,18 +13,31 @@
         <th>Url</th>
         <th>Id</th>
         <th>Downloaded?</th>
+        <th></th>
     </tr>
     </thead>
     @foreach (var song in Model)
     {
         <tr>
-            <td>@song.Title</td>
-            <td>@song.Artist</td>
-            <td>@song.Album</td>
-            <td><a href="@song.Url" target="_blank">@song.Url</a></td>
-            <td>@song.Id</td>
-            <td>@(song.IsDownloaded() ? "Yes" : "No")</td>
+            <td id="song-@song.Id-title">@song.Title</td>
+            <td id="song-@song.Id-artist">@song.Artist</td>
+            <td id="song-@song.Id-album">@song.Album</td>
+            <td id="song-@song.Id-url">
+                <a href="@song.Url" target="_blank">@song.Url</a>
+            </td>
+            <td id="song-@song.Id-id">@song.Id</td>
+            <td id="song-@song.Id-downloaded">@(song.Downloaded ? "Yes" : "No")</td>
+            <td>
+                <button class="w3-button w3-green" onclick="downloadSong(@song.Id)">Download</button> | 
+                <a class="w3-button w3-blue" href="/Song/Edit/@song.Id">Edit</a>
+            </td>
         </tr>
     }
-
 </table>
+<br/>
+<button class="w3-green w3-button" onclick="downloadAll()">Download All</button>
+<a href="/Song/Add" class="w3-green w3-button">Add Song</a>
+
+@section Scripts {
+    <script src="~/js/songs.js"></script>
+}

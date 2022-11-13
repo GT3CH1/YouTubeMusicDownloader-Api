@@ -1,8 +1,7 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using NUnit.Framework;
 using YouTubeDownloader.Contexts;
 using YouTubeDownloader.Controllers;
@@ -13,15 +12,6 @@ namespace YouTubeDownlaoderTests;
 [TestFixture]
 public class Tests
 {
-    // The songs db context
-    private static SongsDbContext _context;
-
-    // The controller
-    private static SongController _controller;
-
-    // A list of songs to experiment with
-    private static List<Song> _songs;
-
     [OneTimeSetUp]
     public void Setup()
     {
@@ -30,7 +20,10 @@ public class Tests
             .UseInMemoryDatabase("Songs")
             .Options;
         _context = new SongsDbContext(options);
-        _controller = new SongController(_context);
+        configuration = new ConfigurationBuilder()
+            .AddJsonFile("appsettings.json")
+            .Build();
+        _controller = new SongController(_context, null);
         // Create a list of songs.
         _songs = new List<Song>
         {
@@ -69,10 +62,22 @@ public class Tests
         _context.Dispose();
     }
 
+    // The songs db context
+    private static SongsDbContext _context;
+
+    // The controller
+    private static SongController _controller;
+
+    private static IConfiguration configuration;
+
+    // A list of songs to experiment with
+    private static List<Song> _songs;
+
     /// <summary>
-    /// Tests adding a single song to the database.
+    ///     Tests adding a single song to the database.
     /// </summary>
-    [Test, Order(1)]
+    [Test]
+    [Order(1)]
     public void TestAddSong()
     {
         // Get the previous count of songs
@@ -84,9 +89,10 @@ public class Tests
     }
 
     /// <summary>
-    /// Tests adding a list of songs to the database.
+    ///     Tests adding a list of songs to the database.
     /// </summary>
-    [Test, Order(2)]
+    [Test]
+    [Order(2)]
     public void TestAddList()
     {
         // Get the previous count of songs
@@ -99,9 +105,10 @@ public class Tests
     }
 
     /// <summary>
-    /// Checks whether or not the three added songs are in the database, and the information is correct.
+    ///     Checks whether or not the three added songs are in the database, and the information is correct.
     /// </summary>
-    [Test, Order(3)]
+    [Test]
+    [Order(3)]
     public void TestAddSongsInfo()
     {
         var songsInDb = _context.Songs.ToList();
@@ -118,13 +125,13 @@ public class Tests
             Assert.AreEqual(tmpList[i].Album, songsInDb[i].Album);
             Assert.AreEqual(tmpList[i].Url, songsInDb[i].Url);
         }
-
     }
-    
+
     /// <summary>
-    /// Tests to see if all songs in the database are listed as Json.
+    ///     Tests to see if all songs in the database are listed as Json.
     /// </summary>
-    [Test, Order(4)]
+    [Test]
+    [Order(4)]
     public void TestGetAllSongs()
     {
         var songs = _controller.GetAllSongs();
@@ -141,23 +148,25 @@ public class Tests
     }
 
     /// <summary>
-    /// Tests whether or not the song with the given id is deleted.
+    ///     Tests whether or not the song with the given id is deleted.
     /// </summary>
-    [Test, Order(5)]
+    [Test]
+    [Order(5)]
     public void TestDeleteSong()
     {
         var id = 1;
         // Get the count of songs
         var count = _context.Songs.Count();
         // Delete the song
-        _controller.DeleteSong(id);
+        _controller.Delete(id);
         // Check the count is one less.
         Assert.AreEqual(count - 1, _context.Songs.Count());
         // Check that the song is not in the database.
         Assert.IsFalse(_context.Songs.Any(s => s.Id == id));
     }
 
-    [Test, Order(6)]
+    [Test]
+    [Order(6)]
     public void TestEditSong()
     {
         // Get the song to edit
@@ -168,7 +177,7 @@ public class Tests
         song.Album = "Edited Album";
         song.Url = "https://peasenet.com/edited";
         // Save the song
-        _controller.EditSong(song.Id,song);
+        _controller.Edit(song);
         // Check that the song is in the database.
         Assert.IsTrue(_context.Songs.Any(s => s.Id == song.Id));
         // Check that the song is the same as the edited song.
@@ -176,13 +185,14 @@ public class Tests
         Assert.AreEqual(song.Artist, _context.Songs.First(s => s.Id == song.Id).Artist);
         Assert.AreEqual(song.Album, _context.Songs.First(s => s.Id == song.Id).Album);
         Assert.AreEqual(song.Url, _context.Songs.First(s => s.Id == song.Id).Url);
-        Assert.False(song.IsDownloaded());
+        Assert.False(song.Downloaded);
     }
 
     /// <summary>
-    ///  Deletes a list of songs based off of id.
+    ///     Deletes a list of songs based off of id.
     /// </summary>
-    [Test, Order(7)]
+    [Test]
+    [Order(7)]
     public void TestDeleteList()
     {
         // Get the count of songs
@@ -191,18 +201,12 @@ public class Tests
         var songs = _context.Songs.ToList();
         // Get the Ids of the songs to delete
         var ids = new List<int>();
-        for (var i = 0; i < songs.Count; i++)
-        {
-            ids.Add(songs[i].Id);
-        }
+        for (var i = 0; i < songs.Count; i++) ids.Add(songs[i].Id);
         // Delete the songs
-        _controller.DeleteSongList(ids);
+        _controller.DeleteList(ids);
         // Check that the count is count-ids less
         Assert.AreEqual(count - ids.Count, _context.Songs.Count());
         // Check that the songs are not in the database.
-        foreach (var id in ids)
-        {
-            Assert.IsFalse(_context.Songs.Any(s => s.Id == id));
-        }
+        foreach (var id in ids) Assert.IsFalse(_context.Songs.Any(s => s.Id == id));
     }
 }

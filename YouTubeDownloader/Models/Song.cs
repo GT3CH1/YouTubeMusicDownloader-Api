@@ -6,39 +6,53 @@ namespace YouTubeDownloader.Models;
 
 public class Song
 {
+    [Display(Name = "Song URL")]
+    [RegularExpression("^(http(s)?:\\/\\/)?((w){3}.)?youtu(be|.be)?(\\.com)?\\/watch\\?v=.+", ErrorMessage = "Please enter a valid URL")]
+    [Required]
     public string Url { get; set; }
+
+    [Display(Name = "Song Title")]
+    [Required]
     public string Title { get; set; }
-    public string Artist { get; set; }
-    public string Album { get; set; }
-    private int Downloaded { get; set; }
+
+    [Display(Name = "Song Artist")]
+    [Required]public string Artist { get; set; }
+
+    [Display(Name = "Song Album")]
+    [Required]public string Album { get; set; }
+
+    public bool Downloaded { get; set; }
     [Key] public int Id { get; set; }
 
-    public bool IsDownloaded() => Downloaded == 1;
-    public void SetDownloaded(bool value) => Downloaded = value ? 1 : 0;
-
     /// <summary>
-    /// Gets the title without punctuation or symbols.
+    ///     Gets the title without punctuation or symbols.
     /// </summary>
     /// <returns>The title without punctuation.</returns>
-    public string GetTitleWithoutPunctuation() =>
-        new string(Title.Where(c => !(char.IsPunctuation(c) || char.IsSymbol(c))).ToArray());
+    public string GetTitleWithoutPunctuation()
+    {
+        return new(Title.Where(c => !(char.IsPunctuation(c) || char.IsSymbol(c))).ToArray());
+    }
 
     /// <summary>
-    /// Gets the artist without punctuation or symbols.
+    ///     Gets the artist without punctuation or symbols.
     /// </summary>
     /// <returns>The artist without punctuation.</returns>
-    public string GetArtistWithoutPunctuation() =>
-        new string(Artist.Where(c => !(char.IsPunctuation(c) || char.IsSymbol(c))).ToArray());
+    public string GetArtistWithoutPunctuation()
+    {
+        return new(Artist.Where(c => !(char.IsPunctuation(c) || char.IsSymbol(c))).ToArray());
+    }
 
     /// <summary>
-    /// Gets the album without punctuation or symbols.
+    ///     Gets the album without punctuation or symbols.
     /// </summary>
     /// <returns>The album without punctuation.</returns>
-    public string GetAlbumWithoutPunctuation() =>
-        new string(Album.Where(c => !(char.IsPunctuation(c) || char.IsSymbol(c))).ToArray());
+    public string GetAlbumWithoutPunctuation()
+    {
+        return new(Album.Where(c => !(char.IsPunctuation(c) || char.IsSymbol(c))).ToArray());
+    }
 
     /// <summary>
-    ///  Downloads this song using youtube-dl.
+    ///     Downloads this song using youtube-dl.
     /// </summary>
     /// <returns>True if the song was successfully downloaded.</returns>
     public bool Download(string songPath)
@@ -80,7 +94,7 @@ public class Song
         file.Tag.AlbumArtists = new[] { Artist };
         file.Tag.Album = Album;
         file.Save();
-        SetDownloaded(true);
+        Downloaded = true;
         return true;
     }
 }
